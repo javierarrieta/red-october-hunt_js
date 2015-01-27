@@ -1,2 +1,2 @@
 # red-october-hunt_js
-Battleship scala.js self contained application
+battleship.Battleship scala.js self contained application
