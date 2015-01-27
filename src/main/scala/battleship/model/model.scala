@@ -9,22 +9,22 @@ case class Tile(x: Int, y: Int) {
 
 trait OrthogonalSegment {
   
-  protected def validate = assert(a.x == b.x || a.y == b.y)
+  protected def validate() = assert(a.x == b.x || a.y == b.y)
   
   def a: Tile
   def b: Tile
   
   lazy val leftBottom = if (a < b) a else b
-  lazy val rightUp = if(b < a) a else b
+  lazy val rightTop = if(b < a) a else b
   
   def size = abs(max(a.x - b.x, a.y - b.y))
 
-  def contains(t: Tile): Boolean = (t.x >= leftBottom.x && t.x <= rightUp.x && t.y >= leftBottom.y && t.y <= rightUp.y)
+  def contains(t: Tile): Boolean = (t.x >= leftBottom.x && t.x <= rightTop.x && t.y >= leftBottom.y && t.y <= rightTop.y)
   
 }
 
 case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends OrthogonalSegment {
-  assert(a.x == b.x || a.y == b.y)
+  validate()
   
   def sunk: Boolean = size == shots.size
   def shoot(t: Tile): Ship = {
@@ -32,3 +32,7 @@ case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends Or
     else copy(a,b, shots :+ t)
   }
 }
+
+case class Player(name: String, ships: Iterable[Ship])
+
+case class Game(gridSize: Int, playerA: Player, playerB: Player)
