@@ -26,13 +26,18 @@ trait OrthogonalSegment {
 case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends OrthogonalSegment {
   validate()
   
-  def sunk: Boolean = size == shots.size
+  def remaining = size - shots.size
+  def sunk: Boolean = remaining == 0
   def shoot(t: Tile): Ship = {
     if(shots.contains(t) || (!contains(t))) this
     else copy(a,b, shots :+ t)
   }
 }
 
-case class Player(name: String, ships: Iterable[Ship])
+case class Board(playerName: String, ships: Iterable[Ship]) {
+  def tilesRemaining = ships.foldLeft(0)(_ + _.remaining)
+  def shipsRemaining = ships.filter(!_.sunk)
+  def lost = tilesRemaining == 0
+}
 
-case class Game(gridSize: Int, playerA: Player, playerB: Player)
+case class Game(gridSize: Int, playerA: Board, playerB: Board)
