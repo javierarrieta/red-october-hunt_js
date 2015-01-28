@@ -22,7 +22,27 @@ class ModelSpec extends Specification {
       ship.overlaps(overlapping) must beTrue
     }
     "not allow to create a non orthogonal ship" in {
-      Ship(Tile(0, 0), Tile(1, 1)) must throwA[InvocationTargetException]
+      Ship(Tile(0, 0), Tile(1, 1)) must throwA[AssertionError]
+    }
+    "have a size corresponding to the number of tiles" in {
+      ship.size must equalTo(2)
+    }
+  }
+  
+  "A board" should {
+
+    val ships = Seq(Ship(Tile(0, 0), Tile(0, 1)), Ship(Tile(2, 2), Tile(2, 3)))
+    val board = Board(4, ships)
+    "report all ships as remaining if none sunk" in {
+      board.shipsRemaining must equalTo(ships)
+      board.tilesRemaining must equalTo(4)
+    }
+    
+    val generated = Board(10, 5)
+    
+    "generated should have the correct number of ships" in {
+      generated.shipsRemaining.size must equalTo(15)
+      generated.tilesRemaining must equalTo(35)
     }
   }
 }

@@ -20,7 +20,7 @@ trait OrthogonalSegment {
   lazy val leftBottom = if (a < b) a else b
   lazy val rightTop = if(b < a) a else b
   
-  def size = abs(max(a.x - b.x, a.y - b.y))
+  lazy val size = rightTop.x - leftBottom.x + rightTop.y - leftBottom.y + 1
 
   def contains(t: Tile): Boolean = (t.x >= leftBottom.x && t.x <= rightTop.x && t.y >= leftBottom.y && t.y <= rightTop.y)
   
