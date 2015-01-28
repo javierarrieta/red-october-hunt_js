@@ -19,6 +19,12 @@ class ModelSpec extends Specification {
       overlapping.overlaps(ship) must beTrue
       ship.overlaps(overlapping) must beTrue
     }
+    "not be adjacent to adjacent tiles" in {
+      ship.containsOrAdjacent(Tile(1,1)) must beTrue
+      ship.containsOrAdjacent(Tile(0,2)) must beTrue
+      ship.containsOrAdjacent(Tile(0,3)) must beFalse
+      ship.containsOrAdjacent(Tile(2,1)) must beFalse
+    }
     "not allow to create a non orthogonal ship" in {
       Ship(Tile(0, 0), Tile(1, 1)) must throwA[AssertionError]
     }
@@ -36,11 +42,11 @@ class ModelSpec extends Specification {
       board.tilesRemaining must equalTo(4)
     }
     
-    val generated = Board(10, 5)
+    val generated = Board.random(10, 5)
     
     "generated should have the correct number of ships" in {
-      generated.shipsRemaining.size must equalTo(15)
-      generated.tilesRemaining must equalTo(35)
+      generated.shipsRemaining.size must equalTo(10)
+      generated.tilesRemaining must equalTo(30)
     }
     
     "generated should have the correct number of tiles per type" in {

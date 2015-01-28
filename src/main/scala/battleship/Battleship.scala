@@ -13,7 +13,7 @@ import scala.util.Random
 object Battleship {
 
   val names = List("Javier", "Greg", "Juan", "Devin", "Jonathan", "Manoj")
-  val myBoard = Board(10, 5)
+  val myBoard = Board.random(10, 5)
   val player = Player(Random.shuffle(names).head, myBoard)
   
   @JSExport

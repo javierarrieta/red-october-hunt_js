@@ -6,6 +6,8 @@ import scala.util.Random
 case class Tile(x: Int, y: Int) {
   def < (t: Tile): Boolean = x < t.x || y < t.y
   def > (t: Tile): Boolean = x > t.x || y > t.y
+  def - (xOff: Int, yOff: Int) = Tile(x - xOff, y - yOff)
+  def + (xOff: Int, yOff: Int) = Tile(x + xOff, y + yOff)
 }
 
 trait OrthogonalSegment {
@@ -21,6 +23,8 @@ trait OrthogonalSegment {
   lazy val size = rightTop.x - leftBottom.x + rightTop.y - leftBottom.y + 1
 
   def contains(t: Tile): Boolean = (t.x >= leftBottom.x && t.x <= rightTop.x && t.y >= leftBottom.y && t.y <= rightTop.y)
+  def containsOrAdjacent(t: Tile): Boolean = (t.x >= leftBottom.x - 1 && t.x <= rightTop.x + 1
+                                           && t.y >= leftBottom.y - 1 && t.y <= rightTop.y + 1)
   
   lazy val tiles: Seq[Tile] = {
     if(leftBottom.x == rightTop.x) Range(leftBottom.y, rightTop.y + 1).map(Tile(leftBottom.x, _))
@@ -30,6 +34,7 @@ trait OrthogonalSegment {
 
 case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends OrthogonalSegment {
   def overlaps(ship: Ship): Boolean = tiles.foldLeft(false)(_ || ship.contains(_))
+  def overlapsOrAdjacent(ship: Ship): Boolean = tiles.foldLeft(false)(_ || ship.containsOrAdjacent(_))
 
   validate()
   
@@ -47,7 +52,7 @@ case class Board(size: Int, ships: Seq[Ship]) {
   lazy val shotsInTarget = ships.flatMap(_.shots)
   lazy val shipTiles = ships.flatMap(_.tiles)
   lazy val lost = tilesRemaining == 0
-  def overlaps(ship: Ship): Boolean = ships.foldLeft(false)(_ || _.overlaps(ship))
+  def overlaps(ship: Ship): Boolean = ships.foldLeft(false)(_ || _.overlapsOrAdjacent(ship))
   
   def tileType(t: Tile): TileType = {
     if (shotsInTarget.contains(t)) Wreck
@@ -57,10 +62,10 @@ case class Board(size: Int, ships: Seq[Ship]) {
 }
 
 object Board {
-  def apply(size: Int, maxShipSize: Int): Board = {
+  def random(size: Int, maxShipSize: Int): Board = {
     @tailrec
     def generateShips(acc: Seq[Int])(number: Int, remaining: Int): Seq[Int] = remaining match {
-      case 0 => acc
+      case 1 => acc //2 tiles is the smallest size of boat
       case _ => generateShips(acc ++ Seq.fill(number)(remaining))(number + 1, remaining - 1)
     }
     def allocateShip(board: Board, shipSize: Int): Board = {
@@ -68,16 +73,15 @@ object Board {
       if(board.overlaps(ship))
         allocateShip(board, shipSize)
       else
-        board.copy( ships = board.ships :+ ship)
+        board.copy(ships = board.ships :+ ship)
     }
     generateShips(Nil)(1,maxShipSize).foldLeft(Board(size, Nil))(allocateShip)
-    
   }
   
   private def randomShip(boardSize: Int, shipSize: Int): Ship = {
     val horizontal = Random.nextBoolean()
     val orig = Random.nextInt(boardSize - shipSize + 1)
-    val otherCoord = Random.nextInt(shipSize)
+    val otherCoord = Random.nextInt(boardSize)
     Ship(
       Tile(
         if(horizontal) orig else otherCoord,
