@@ -1,7 +1,5 @@
 package battleship.model
 
-import Math._
-
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -44,10 +42,18 @@ case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends Or
 }
 
 case class Board(size: Int, ships: Seq[Ship]) {
-  def tilesRemaining = ships.foldLeft(0)(_ + _.remaining)
-  def shipsRemaining = ships.filter(!_.sunk)
-  def lost = tilesRemaining == 0
+  lazy val tilesRemaining = ships.foldLeft(0)(_ + _.remaining)
+  lazy val shipsRemaining = ships.filter(!_.sunk)
+  lazy val shotsInTarget = ships.flatMap(_.shots)
+  lazy val shipTiles = ships.flatMap(_.tiles)
+  lazy val lost = tilesRemaining == 0
   def overlaps(ship: Ship): Boolean = ships.foldLeft(false)(_ || _.overlaps(ship))
+  
+  def tileType(t: Tile): TileType = {
+    if (shotsInTarget.contains(t)) Wreck
+    else if(shipTiles.contains(t)) Deck
+    else Water
+  }
 }
 
 object Board {
@@ -87,3 +93,8 @@ object Board {
 }
 
 case class Game(gridSize: Int, playerA: Board, playerB: Board)
+
+sealed trait TileType
+object Water extends TileType
+object Deck  extends TileType
+object Wreck extends TileType
