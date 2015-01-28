@@ -3,13 +3,16 @@ package battleship
 import battleship.model._
 import org.scalajs.dom.{HTMLElement, document}
 import scala.scalajs.js.Dynamic.{ global => g }
+import battleship.firebase.FirebaseMe
+import org.scalajs.dom
 
 import scala.scalajs.js.annotation.JSExport
 
 @JSExport
 object Battleship {
-  
-  val myBoard = Board(10,5)
+
+  val names = List("Javier", "Greg", "Juan", "Devin", "Jonathan", "Manoj")
+  val myBoard = Player(10, names.head /* randomize or pass a name  */,5)
   
   @JSExport
   def fire(row: Int, col: Int): Unit = {

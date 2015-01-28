@@ -13,7 +13,7 @@ scalaVersion := "2.11.5"
 
 libraryDependencies ++= Seq(
   "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
-  "org.webjars" % "firebase" % "2.0.4",
+  "com.lihaoyi" %%% "upickle" % "0.2.5",
   "org.specs2" %% "specs2-core" % "2.4.15" % "test"
 )
 

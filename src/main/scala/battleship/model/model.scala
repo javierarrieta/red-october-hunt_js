@@ -41,7 +41,7 @@ case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends Or
   }
 }
 
-case class Board(size: Int, ships: Seq[Ship]) {
+case class Player(size: Int, name: String, ships: Seq[Ship]) {
   lazy val tilesRemaining = ships.foldLeft(0)(_ + _.remaining)
   lazy val shipsRemaining = ships.filter(!_.sunk)
   lazy val shotsInTarget = ships.flatMap(_.shots)
@@ -56,21 +56,21 @@ case class Board(size: Int, ships: Seq[Ship]) {
   }
 }
 
-object Board {
-  def apply(size: Int, maxShipSize: Int): Board = {
+object Player {
+  def apply(size: Int, maxShipSize: Int): Player = {
     @tailrec
     def generateShips(acc: Seq[Int])(number: Int, remaining: Int): Seq[Int] = remaining match {
       case 0 => acc
       case _ => generateShips(acc ++ Seq.fill(number)(remaining))(number + 1, remaining - 1)
     }
-    def allocateShip(board: Board, shipSize: Int): Board = {
+    def allocateShip(board: Player, shipSize: Int): Player = {
       val ship = randomShip(board.size, shipSize)
       if(board.overlaps(ship))
         allocateShip(board, shipSize)
       else
         board.copy( ships = board.ships :+ ship)
     }
-    generateShips(Nil)(1,maxShipSize).foldLeft(Board(size, Nil))(allocateShip)
+    generateShips(Nil)(1,maxShipSize).foldLeft(Player(size, Nil))(allocateShip)
     
   }
   
@@ -92,9 +92,11 @@ object Board {
   
 }
 
-case class Game(gridSize: Int, playerA: Board, playerB: Board)
+case class Game(gridSize: Int, playerA: Player, playerB: Player)
 
 sealed trait TileType
 object Water extends TileType
 object Deck  extends TileType
 object Wreck extends TileType
+
+case class OnlinePlayer(username: String)
