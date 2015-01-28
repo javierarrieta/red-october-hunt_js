@@ -2,6 +2,9 @@ package battleship.model
 
 import Math._
 
+import scala.annotation.tailrec
+import scala.util.Random
+
 case class Tile(x: Int, y: Int) {
   def < (t: Tile): Boolean = x < t.x || y < t.y
   def > (t: Tile): Boolean = x > t.x || y > t.y
@@ -21,9 +24,15 @@ trait OrthogonalSegment {
 
   def contains(t: Tile): Boolean = (t.x >= leftBottom.x && t.x <= rightTop.x && t.y >= leftBottom.y && t.y <= rightTop.y)
   
+  lazy val tiles: Seq[Tile] = {
+    if(leftBottom.x == rightTop.x) Range(leftBottom.y, rightTop.y).map(Tile(leftBottom.x, _))
+    else Range(leftBottom.x, rightTop.x).map(Tile(_,leftBottom.y))
+  }
 }
 
 case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends OrthogonalSegment {
+  def overlaps(ship: Ship): Boolean = tiles.foldLeft(false)(_ || ship.contains(_))
+
   validate()
   
   def remaining = size - shots.size
@@ -34,10 +43,47 @@ case class Ship(a: Tile, b: Tile, shots: Seq[Tile] = Seq.empty[Tile]) extends Or
   }
 }
 
-case class Board(playerName: String, ships: Iterable[Ship]) {
+case class Board(size: Int, ships: Seq[Ship]) {
   def tilesRemaining = ships.foldLeft(0)(_ + _.remaining)
   def shipsRemaining = ships.filter(!_.sunk)
   def lost = tilesRemaining == 0
+  def overlaps(ship: Ship): Boolean = ships.foldLeft(false)(_ || _.overlaps(ship))
+}
+
+object Board {
+  def apply(size: Int, maxShipSize: Int): Board = {
+    @tailrec
+    def generateShips(acc: Seq[Int])(number: Int, remaining: Int): Seq[Int] = remaining match {
+      case 0 => acc
+      case _ => generateShips(acc ++ Seq.fill(number)(remaining))(number + 1, remaining - 1)
+    }
+    def allocateShip(board: Board, shipSize: Int): Board = {
+      val ship = randomShip(board.size, shipSize)
+      if(board.overlaps(ship))
+        allocateShip(board, shipSize)
+      else
+        board.copy( ships = board.ships :+ ship)
+    }
+    generateShips(Nil)(1,maxShipSize).foldLeft(Board(size, Nil))(allocateShip)
+    
+  }
+  
+  private def randomShip(boardSize: Int, shipSize: Int): Ship = {
+    val horizontal = Random.nextBoolean()
+    val orig = Random.nextInt(boardSize - shipSize + 1)
+    val otherCoord = Random.nextInt(shipSize)
+    Ship(
+      Tile(
+        if(horizontal) orig else otherCoord,
+        if(horizontal) otherCoord else orig
+      ),
+      Tile(
+        if(horizontal) orig + shipSize - 1 else otherCoord,
+        if(horizontal) otherCoord else orig + shipSize - 1
+      )
+    )
+  }
+  
 }
 
 case class Game(gridSize: Int, playerA: Board, playerB: Board)
