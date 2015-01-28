@@ -1,14 +1,13 @@
 package battleship.firebase
 
-import battleship.model.{OnlinePlayer, Game, Player}
-
-import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExport}
-
+import battleship.model.Game
 import upickle._
 
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExport
+
 /**
- * 
+ *
  */
 @JSExport
 object FirebaseMe {

@@ -7,12 +7,14 @@ import battleship.firebase.FirebaseMe
 import org.scalajs.dom
 
 import scala.scalajs.js.annotation.JSExport
+import scala.util.Random
 
 @JSExport
 object Battleship {
 
   val names = List("Javier", "Greg", "Juan", "Devin", "Jonathan", "Manoj")
-  val myBoard = Player(10, names.head /* randomize or pass a name  */,5)
+  val myBoard = Board(10, 5)
+  val player = Player(Random.shuffle(names).head, myBoard)
   
   @JSExport
   def fire(row: Int, col: Int): Unit = {
