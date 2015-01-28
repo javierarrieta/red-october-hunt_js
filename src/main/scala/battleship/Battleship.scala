@@ -34,9 +34,14 @@ object Battleship {
     val myboard: HTMLElement = document.createElement("div")
     myboard.setAttribute("id","myboard")
 
-    val oponentsBoard = document.createElement("div")
-    oponentsBoard.setAttribute("id","opponent")
+    //render title
+    val mytitle = document.createElement("h2")
+    val text = document.createTextNode("My board")
+    mytitle.appendChild(text)
+    boards.appendChild(mytitle)
 
+
+    //render my own board
     for (i <- Range(0,8)){
       for (j <- Range(0,8)) {
        val cell = document.createElement("div")
@@ -49,7 +54,17 @@ object Battleship {
       clear.setAttribute("style", "clear: both")
       myboard.appendChild(clear)
     }
+    boards.appendChild(myboard)
+    
+    //render title for oponent's board
+    val oponenttitle = document.createElement("h2")
+    val text2 = document.createTextNode("Oponent board")
+    oponenttitle.appendChild(text2)
+    boards.appendChild(oponenttitle)
 
+    //render oponent board
+    val oponentsBoard = document.createElement("div")
+    oponentsBoard.setAttribute("id","opponent")
     for (i <- Range(0,8)){
       for (j <- Range(0,8)) {
         val cell = document.createElement("div")
@@ -65,7 +80,6 @@ object Battleship {
     }
 
 
-    boards.appendChild(myboard)
     boards.appendChild(oponentsBoard)
   }
 }
