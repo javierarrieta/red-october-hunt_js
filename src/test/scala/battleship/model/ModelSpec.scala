@@ -1,7 +1,5 @@
 package battleship.model
 
-import java.lang.reflect.InvocationTargetException
-
 import org.specs2.mutable.Specification
 
 class ModelSpec extends Specification {
@@ -43,6 +41,21 @@ class ModelSpec extends Specification {
     "generated should have the correct number of ships" in {
       generated.shipsRemaining.size must equalTo(15)
       generated.tilesRemaining must equalTo(35)
+    }
+    
+    "generated should have the correct number of tiles per type" in {
+      val tiles = for {
+        i <- Range(0, generated.size)
+        j <- Range(0, generated.size)
+      } yield Tile(j,i)
+      
+      val types = tiles.map(generated.tileType)
+
+      val boardTiles = generated.size * generated.size
+      types.size must equalTo(boardTiles)
+      types.count(_ == Wreck) must equalTo(0)
+      types.count(_ == Deck)  must equalTo(generated.tilesRemaining)
+      types.count(_ == Water) must equalTo(boardTiles - generated.tilesRemaining)
     }
   }
 }

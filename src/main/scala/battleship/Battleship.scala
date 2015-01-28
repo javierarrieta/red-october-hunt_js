@@ -33,15 +33,14 @@ object Battleship {
       case Deck  => deckStyle
     }
     
-    for (i <- Range(0,board.size)){
+    for (i <- Range(0,board.size)) {
       for (j <- Range(0,board.size)) {
         val tile = Tile(j,i)
-        val tileType = board.tileType(tile)
         val cell = document.createElement("div")
         cell.setAttribute("row", s"""$i""")
         cell.setAttribute("col", s"""$j""")
         cell.setAttribute("onclick", s"""Battleship().fire($i, $j)""")
-        cell.setAttribute("style", tileMapping(tileType))
+        cell.setAttribute("style", tileMapping(board.tileType(tile)))
         cell.setAttribute("id", s"$i-$j")
         div.appendChild(cell)
       }

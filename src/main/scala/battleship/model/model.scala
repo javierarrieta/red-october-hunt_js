@@ -23,8 +23,8 @@ trait OrthogonalSegment {
   def contains(t: Tile): Boolean = (t.x >= leftBottom.x && t.x <= rightTop.x && t.y >= leftBottom.y && t.y <= rightTop.y)
   
   lazy val tiles: Seq[Tile] = {
-    if(leftBottom.x == rightTop.x) Range(leftBottom.y, rightTop.y).map(Tile(leftBottom.x, _))
-    else Range(leftBottom.x, rightTop.x).map(Tile(_,leftBottom.y))
+    if(leftBottom.x == rightTop.x) Range(leftBottom.y, rightTop.y + 1).map(Tile(leftBottom.x, _))
+    else Range(leftBottom.x, rightTop.x + 1).map(Tile(_,leftBottom.y))
   }
 }
 
